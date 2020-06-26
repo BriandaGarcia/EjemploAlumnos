@@ -1,5 +1,8 @@
 package uam.mx.tsis.ejemplobackend.negocio.modelo;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+
 import lombok.Builder;
 import lombok.Data;
 
@@ -7,9 +10,12 @@ import lombok.Data;
 @Data
 public class Alumno {
 
-	private Integer matricula;
-	
+	@NotBlank
 	private String nombre;
 	
+	@NotBlank
 	private String carrera;
+	
+	@NotNull
+	private Integer matricula;
 }
