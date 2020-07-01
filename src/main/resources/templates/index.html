@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html>
-	<body>
+	<head>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
 		<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 		<script>
 			$(document).ready(function(){
-				$ajaxSetup({contentType: "application/json; charset=utf-8"});
+				$.ajaxSetup({contentType: "application/json; charset=utf-8"});
 				
 				$("#post").click(function(){
 					var alumno =  {matricula:$("#matricula").val(), nombre:$("#nombre").val(), carrera:$("#carrera").val()};
@@ -24,26 +25,35 @@
 					
 					$.get(url, function(data, status){
 						console.log("Status = "+status);
+						console.log("Data = "+data);
 						
 						$("#result").html("Alumno "+data.nombre+" con matricula "+data.matricula+" estudia la carrera de "+data.carrera);
+						$("#nombre").val(data.nombre);
+						$("#carrera").val(data.carrera);
 					});
 				});
 				
 				$("#put").click(function(){
 					var url = "http://localhost:8080/alumnos/"+$("#matricula").val();
-					var alumno =  {nombre:$("#nombre").val(), carrera:$("#carrera").val()};
-					var alumnoJSON = JSON.stringify(alumno);
+					var alumnoJSON = JSON.stringify(
+							{
+								matricula:$("#matricula").val(),
+								nombre:$("#nombre").val(),
+								carrera:$("#carrera").val()
+							}
+						);
 					
-					console.log(url);
 					console.log("Alumno = "+alumnoJSON);
 
 					$.ajax({
 					    url: url,
 					    type: 'PUT',
-					    success: alumnoJSON, function(data, status){
+					    success: function(data, status){
 							console.log("Status = "+status);
-					    	$("#result").html(status/*data.creada*/);
-					    }
+					    	$("#result").html(status);
+					    	alert("Alumno actualizado exitosamente");
+					    },
+					    data: alumnoJSON
 					});
 				});
 				
@@ -55,18 +65,20 @@
 					$.ajax({
 					    url: url,
 					    type: 'DELETE',
-					    success: function(status){
+					    success: function(data,status){
 							console.log("Status = "+status);
 							$("#result").html(status);
+							alert("Alumno borrado exitosamente");
 					    }
 					});	
 				});
 			});
 		</script>
-		
+	</head>
+	<body>
 		<h2>Alumno</h2>
-
-		<form action="/action_page.php">
+		
+		<form>
   			<label>Nombre:</label>
   			<input type="text" id="nombre"><br><br>
   
@@ -75,13 +87,12 @@
   
   			<label>Carrera:</label>
   			<input type="text" id="carrera"><br><br>
-  	
-  			<input type="submit" id="post" value="Enviar">
-  			<input type="submit" id="get" value="Recuperar">
-  			<input type="submit" id="put" value="Actualizar">
-  			<input type="submit" id="delete" value="Eliminar">
-
 		</form>
+  	
+  		<button class="btn btn-success" id="post">Enviar</button>
+  		<button class="btn btn-primary" id="get">Recuperar</button>
+  		<button class="btn btn-outline-success" id="put">Actualizar</button>
+  		<button class="btn btn-danger" id="delete">Eliminar</button>
 		
 		<p id="result"></p> 
 	</body>

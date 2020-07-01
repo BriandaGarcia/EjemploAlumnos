@@ -1,6 +1,7 @@
 package uam.mx.tsis.ejemplobackend.negocio;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -8,7 +9,11 @@ import org.springframework.stereotype.Service;
 import uam.mx.tsis.ejemplobackend.datos.AlumnoRepository;
 import uam.mx.tsis.ejemplobackend.negocio.modelo.Alumno;
 
-
+/**
+ * Clase que contiene la lógica de negocio del manejo de alumnos
+ * @author Brianda Garcia
+ *
+ */
 @Service
 public class AlumnoService {
 
@@ -16,16 +21,16 @@ public class AlumnoService {
 	private AlumnoRepository alumnoRepository;
 	
 	/**
-	 * Crea un nuevo alumno
-	 * @param nuevoAlumno
+	 * Metodo que permite crear nuevos alumnos
+	 * @param nuevoAlumno El alumno que se desea crear en el sistema. Es un objeto de tipo Alumno
 	 * @return el alumno que se acaba de crear si la creacion es exitosa, null de lo contrario
 	 */
 	public Alumno create(Alumno nuevoAlumno) {
 		
 		//REGLA DE NEGOCIO: No se puede crear a más de un alumno con la misma matricula
-		Alumno alumno = alumnoRepository.findByMatricula(nuevoAlumno.getMatricula());
+		Optional <Alumno> alumnoOpt = alumnoRepository.findById(nuevoAlumno.getMatricula());
 		
-		if(alumno == null) {
+		if(!alumnoOpt.isPresent()) {
 			return alumnoRepository.save(nuevoAlumno);
 		} else {
 			return null;
@@ -36,8 +41,8 @@ public class AlumnoService {
 	 * 
 	 * @return Regresa una lista con todos los alumnos en la BD
 	 */
-	public List<Alumno> retrieveAll() {
-		return alumnoRepository.find();
+	public Iterable <Alumno> retrieveAll() {
+		return alumnoRepository.findAll();
 	}
 	
 	/**
@@ -45,9 +50,10 @@ public class AlumnoService {
 	 * @param matricula
 	 * @return regresa el alumno identificado por su matricula
 	 */
-	public Alumno retrieve(Integer matricula) {
-		return alumnoRepository.findByMatricula(matricula);
+	public Optional<Alumno> retrieve(Integer matricula) {
+		return alumnoRepository.findById(matricula);
 	}
+	
 	
 	/**
 	 * 
@@ -55,16 +61,17 @@ public class AlumnoService {
 	 * @param alumnoActualizado informacion actualizada del alumno
 	 * @return regresa el alumno actualizado
 	 */
-	public Alumno update(Integer matricula, Alumno alumnoActualizado) {
-		return alumnoRepository.set(matricula, alumnoActualizado);
+	public Alumno update(Alumno alumnoActualizado) {
+		return alumnoRepository.save(alumnoActualizado);
 	}
+	
 	
 	/**
 	 * 
 	 * @param matricula matricula del alumno que se desea eliminar
 	 * @return regresa el alumno eliminado
 	 */
-	public Alumno delete(Integer matricula) {
-		return alumnoRepository.remove(matricula);
+	public void delete(Integer matricula) {
+		alumnoRepository.deleteById(matricula);
 	}
 }
