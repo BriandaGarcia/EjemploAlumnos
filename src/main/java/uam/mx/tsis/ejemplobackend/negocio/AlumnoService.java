@@ -1,11 +1,12 @@
 package uam.mx.tsis.ejemplobackend.negocio;
 
-import java.util.List;
 import java.util.Optional;
 
+import org.hibernate.validator.cfg.context.ReturnValueTarget;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import lombok.extern.slf4j.Slf4j;
 import uam.mx.tsis.ejemplobackend.datos.AlumnoRepository;
 import uam.mx.tsis.ejemplobackend.negocio.modelo.Alumno;
 
@@ -15,6 +16,7 @@ import uam.mx.tsis.ejemplobackend.negocio.modelo.Alumno;
  *
  */
 @Service
+@Slf4j
 public class AlumnoService {
 
 	@Autowired
@@ -26,19 +28,28 @@ public class AlumnoService {
 	 * @return el alumno que se acaba de crear si la creacion es exitosa, null de lo contrario
 	 */
 	public Alumno create(Alumno nuevoAlumno) {
-		
+				
 		//REGLA DE NEGOCIO: No se puede crear a más de un alumno con la misma matricula
 		Optional <Alumno> alumnoOpt = alumnoRepository.findById(nuevoAlumno.getMatricula());
 		
+		log.info("Alumno con matricula "+nuevoAlumno.getMatricula()+" AlumnoOpt presente? "+alumnoOpt.isPresent());
+
 		if(!alumnoOpt.isPresent()) {
-			return alumnoRepository.save(nuevoAlumno);
+			
+			log.info("Voy a guardar a alumno "+nuevoAlumno);
+			
+			Alumno returnAlumno = alumnoRepository.save(nuevoAlumno);
+			
+			log.info("Voy a regresar a alumno "+returnAlumno);
+
+			return returnAlumno;
 		} else {
 			return null;
 		}
 	}
 
 	/**
-	 * 
+	 * Recupera todos los alumnos de la BD
 	 * @return Regresa una lista con todos los alumnos en la BD
 	 */
 	public Iterable <Alumno> retrieveAll() {
@@ -46,8 +57,8 @@ public class AlumnoService {
 	}
 	
 	/**
-	 * 
-	 * @param matricula
+	 * Recupera un alumno de la BD
+	 * @param matricula identificador del alumno que se desea recuperar
 	 * @return regresa el alumno identificado por su matricula
 	 */
 	public Optional<Alumno> retrieve(Integer matricula) {
@@ -56,22 +67,45 @@ public class AlumnoService {
 	
 	
 	/**
-	 * 
-	 * @param matricula alumno que se desea actualizar
+	 * Actualiza un alumno existente en la BD
 	 * @param alumnoActualizado informacion actualizada del alumno
-	 * @return regresa el alumno actualizado
+	 * @return regresa el alumno actualizado, null si el alumno no existia
 	 */
 	public Alumno update(Alumno alumnoActualizado) {
-		return alumnoRepository.save(alumnoActualizado);
+		
+		//REGLA DE NEGOCIO: NO SE PUEDE ACTUALIZAR UN ALUMNO QUE NO EXISTE
+		Optional <Alumno> alumno = alumnoRepository.findById(alumnoActualizado.getMatricula());
+		
+		//SI EL ALUMNO EXISTE, SE ACTUALIZA Y REGRESA AL ALUMNO ACTUALIZADO
+		if(alumno.isPresent()) {
+			return alumnoRepository.save(alumnoActualizado);
+		}
+		//SI EL ALUMNO NO EXISTE, NO SE PUEDE ACTUALIZAR, REGRESA NULL
+		else {
+			return null;
+		}
 	}
 	
 	
 	/**
-	 * 
+	 * ELIMINA UN ALUMNO EXISTENTE EN LA BD
 	 * @param matricula matricula del alumno que se desea eliminar
-	 * @return regresa el alumno eliminado
+	 * @return True si el alumno se eliminó, false si no
 	 */
-	public void delete(Integer matricula) {
-		alumnoRepository.deleteById(matricula);
+	public boolean delete(Integer matricula) {
+		
+		//REGLA DE NEGOCIO: NO SE PUEDE ELIMINAR UN ALUMNO QUE NO EXISTE
+		Optional <Alumno> alumno = alumnoRepository.findById(matricula);
+				
+		//SI EL ALUMNO EXISTE, SE ELIMINA Y REGRESA TRUE
+		if(alumno.isPresent()) {
+			alumnoRepository.deleteById(matricula);
+			
+			return true;
+		}
+		//SI EL ALUMNO NO EXISTE REGRESA FALSE
+		else {
+			return false;
+		}
 	}
 }

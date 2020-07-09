@@ -90,20 +90,19 @@ public class AlumnoController {
 		
 		log.info("Actualizando al alumno con matricula "+matricula);
 		
-		Optional<Alumno> alumno = alumnoService.retrieve(matricula);
-		
-		if(alumno.isPresent()) {	
-			alumnoActualizado.setMatricula(matricula);
+		//SE ASEGURA DE QUE NO SE MODIFICA LA MATRICULA
+		alumnoActualizado.setMatricula(matricula);
 			
-			alumno = Optional.of(alumnoService.update(alumnoActualizado));
+		//MANDA ACTUALIZAR EL ALUMNO
+		alumnoActualizado = alumnoService.update(alumnoActualizado);
 			
-			if(alumno.isPresent()) {
-				return ResponseEntity.status(HttpStatus.OK).body(alumnoActualizado);
-			} else {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("No se ha podido actualizar el alumno");
-			}
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Alumno con matricula "+matricula+" no encontrado");
+		//SI EL OBJETO DEVUELTO NO ES NULL, EL ALUMNO SE ACTUALIZÓ CORRECTAMENTE
+		if(alumnoActualizado != null) {
+			return ResponseEntity.status(HttpStatus.OK).body(alumnoActualizado);
+		} 
+		//SI EL OBJETO DEVUELTO ES NULL, EL ALUMNO QUE SE INTENTA ACTUALIZAR NO EXISTE
+		else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Alumno con matricula "+matricula+" no encontrado. No se ha podido actualizar alumno");
 		}
 	}
 	
@@ -115,15 +114,14 @@ public class AlumnoController {
 	public ResponseEntity<?> delete(@PathVariable Integer matricula) {
 		
 		log.info("Borrando al alumno con matricula "+matricula);
-		
-		Optional<Alumno> alumno = alumnoService.retrieve(matricula);
-		
-		if(alumno.isPresent()) {
-			alumnoService.delete(matricula);
-
+				
+		//SI RECIBE TRUE EL ALUMNO SE ELIMINÓ CORRECTAMENTE
+		if(alumnoService.delete(matricula)) {
 			return ResponseEntity.status(HttpStatus.OK).body("Alumno con matricula "+matricula+" eliminado correctamente");
-		} else {
-			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Alumno con matricula "+matricula+" no encontrado");
+		} 
+		//SI RECIBE FALSE, EL ALUMNO NO EXISTE, POR LO TANTO NO PUEDE SER ELIMINADO
+		else {
+			return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Alumno con matricula "+matricula+" no encontrado. No se ha podido eliminar");
 		}
 	}
 }
