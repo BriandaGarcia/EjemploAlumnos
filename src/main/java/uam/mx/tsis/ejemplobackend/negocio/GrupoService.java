@@ -20,20 +20,39 @@ public class GrupoService {
 	@Autowired
 	private AlumnoService alumnoService;
 	
-	public Grupo create(Grupo nuevo) {
+	/**
+	 * Metodo que permite crear un nuevo grupo
+	 * @param grupo Grupo nuevo que se creara en la BD 
+	 * @return devuelve el grupo creado
+	 */
+	public Grupo create(Grupo grupo) {
 		//Validar reglas de negocio previas a la creacion
 		
-		return grupoRepository.save(nuevo);
+		return grupoRepository.save(grupo);
 	}
 	
+	/**
+	 * Metodo que permite recuperar todos los grupos de la BD
+	 * @return Una lista de todos los grupos recuperados
+	 */
 	public Iterable<Grupo> retrieveAll(){
 		return grupoRepository.findAll();
 	}
 	
+	/**
+	 * Metodo que permite recuperar un grupo por su id
+	 * @param id id del grupo que se desea recuperar
+	 * @return El grupo recuperado. Un optional de tipo Grupo que puede o no contener el grupo
+	 */
 	public Optional<Grupo> retrieve(Integer id) {
 		return grupoRepository.findById(id);
 	}
 	
+	/**
+	 * Metodo que permite actualizar un grupo existente
+	 * @param grupoActualizado Información del grupo que se desea actualizar
+	 * @return El grupo actualizado si se actualizó correctamente, null en caso contrario
+	 */
 	public Grupo update(Grupo grupoActualizado) {
 		
 		//REGLA DE NEGOCIO: NO SE PUEDE ACTUALIZAR UN GRUPO QUE NO EXISTE
@@ -49,6 +68,11 @@ public class GrupoService {
 		}
 	}
 	
+	/**
+	 * Metodo que permite eliminar un grupo
+	 * @param id id del grupo que se desea eliminar
+	 * @return true si el grupo existe y se eliminó correctamente, false si no
+	 */
 	public boolean delete(Integer id) {
 		
 		//REGLA DE NEGOCIO: NO SE PUEDE ELIMINAR UN GRUPO QUE NO EXISTE
